@@ -18,7 +18,8 @@ export default function App() {
   // const [apiData, setApiData] = useState()
   const [result, setResult] = useState();
   // const [curs, setCurs] = useState();
-  const [availableCur, setAvailableCur] = useState([]);
+  const [availableCur, setAvailableCur] = useState({});
+
 
 
 
@@ -31,33 +32,32 @@ export default function App() {
   }
 
   const count = () => {
-    console.log(dummyapidata.rates[selectedCurrency])
 
-    let r = dummyapidata.rates[selectedCurrency]
+    if (!availableCur)return;
+    let r = availableCur[selectedCurrency];
     let calc = amount / r
      setResult(Number.parseFloat(calc).toFixed(2));
-    console.log(result)
-    console.log(availableCur)
+ 
   };
 
-  // var myHeaders = new Headers();
-  // myHeaders.append("apikey", "K2BIPNpDzfjeObNrQolMyDlzr8aJQbPi");
+  var myHeaders = new Headers();
+  myHeaders.append("apikey", "adunRcpgGApFOGxfXsSG7EoCQ7sXfhSj");
 
-  // var requestOptions = {
-  //   method: "GET",
-  //   redirect: "follow",
-  //   headers: myHeaders,
-  // };
+  var requestOptions = {
+    method: "GET",
+    redirect: "follow",
+    headers: myHeaders,
+  };
 
-  // useEffect(() => {
-  //   fetch("https://api.apilayer.com/exchangerates_data/latest?symbols=GBP%2CJPY%2CUSD&base=EUR", requestOptions)
-  //   .then(response => response.json())
-  //   .then(setAvailableCur(Object.keys(data.rates)))
-  // },[])
+  useEffect(() => {
+    fetch("https://api.apilayer.com/exchangerates_data/latest?symbols=GBP%2CJPY%2CUSD&base=EUR", requestOptions)
+    .then(response => response.json())
+    .then(responseJson => {
+      setAvailableCur(responseJson.rates)
+      console.log(Object.keys(responseJson.rates) + ' in useeffect')
+    })
+  },[])
 
-
-  //asettaa kurssin   
-  let curs = Object.keys(dummyapidata.rates);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -78,7 +78,8 @@ export default function App() {
             setSelectedCurrency(itemValue)
           }
         >
-          {curs.map(cur => (<Picker.Item label={cur} value={cur} />))  }
+        {availableCur && Object.keys(availableCur).map(cur => (<Picker.Item label={cur} value={cur} />))}
+
         </Picker> 
 
         <Button title="convert" onPress={count}></Button>
